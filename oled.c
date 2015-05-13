@@ -84,8 +84,10 @@ void draw_char(int w, int h, int x, int y, char *data)
 	unsigned char idx	= 0 ;
 	unsigned height		= h/8; 	    //OLED는 한 페이지당 8픽셀을 차지
 	unsigned startY		= CHANGE_PAGE + y; //0xB0은 OLED의 어떤 페이지를 선택하는지에대한 명령어이다
-	unsigned startX         = x+5;	    //+1을하는 이유는 가독성을 높이기 위해서이다(이전글자로부터1픽셀 띄어서 )
+	unsigned startX     = x+5;	    //+1을하는 이유는 가독성을 높이기 위해서이다(이전글자로부터1픽셀 띄어서 )
 	unsigned endX		= startX + w;
+    
+
 	for( i=0;i<height;i++ )
 	{
 		write_oled(startY+i);
@@ -101,6 +103,36 @@ void draw_char(int w, int h, int x, int y, char *data)
 	}
 }
 
+void clear_partial(int w, int h, int x, int y)
+{
+    /*
+     * w : 클리어될 글자의 width
+     * h : 클리어될 글자의 height
+     * x : 클리어될 글자의 시작 x 좌표 (0~128)
+     * y : 클리어될 글자의 시작 y 좌표 (0~7)
+     */
+    
+    unsigned char i,j;
+    unsigned height		= h/8; 	    //OLED는 한 페이지당 8픽셀을 차지
+    unsigned startY		= CHANGE_PAGE + y; //0xB0은 OLED의 어떤 페이지를 선택하는지에대한 명령어이다
+    unsigned startX     = x+5;	    //+1을하는 이유는 가독성을 높이기 위해서이다(이전글자로부터1픽셀 띄어서 )
+    unsigned endX		= startX + w;
+    
+    for( i=0;i<height;i++ )
+    {
+        write_oled(startY+i);
+        write_oled(CHANGE_COLUM);
+        write_oled(startX);
+        write_oled(endX-1);
+        
+        for(j=0;j<w;j++)
+        {	
+            write_oled_data(0x00);
+            _delay_us(100);
+        }
+    }
+}
+
 void draw_data(int w, int h, int x, int y, char data)
 {
 	/*
@@ -114,8 +146,9 @@ void draw_data(int w, int h, int x, int y, char data)
 	unsigned char i,j;
 	unsigned height		= h/8; 	    //OLED는 한 페이지당 8픽셀을 차지
 	unsigned startY		= CHANGE_PAGE + y; //0xB0은 OLED의 어떤 페이지를 선택하는지에대한 명령어이다
-	unsigned startX         = x;	    //+1을하는 이유는 가독성을 높이기 위해서이다(이전글자로부터1픽셀 띄어서 )
+	unsigned startX     = x;	    //+1을하는 이유는 가독성을 높이기 위해서이다(이전글자로부터1픽셀 띄어서 )
 	unsigned endX		= startX + w;
+    
 	for( i=0;i<height;i++ )
 	{
 		write_oled(startY+i);
@@ -150,7 +183,9 @@ void write_num_to_oled(unsigned long current_money)
 			break;
 	}
 
-	startX = (100 - (position * 8))/2 ; // 출력할 숫자를 가운데 정렬하기위한 
+	startX = (110 - ((position+1) * 8))/2 ; // 출력할 숫자를 가운데 정렬하기위한
+    
+    clear_partial(8*(position+1),16,startX,5); // 그려진부분에 겹처서 그리는것을 방지하기위해 그리고자하는 부분에 그려져있던것을 클리어
 
 	for( position = position-1 ; position > 0 ; position-- )
    		draw_char(8,16,startX+(i++*10),5,font_num[curr_coin[position]]);

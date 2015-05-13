@@ -26,4 +26,5 @@ void draw_char(int w, int h, int x, int y, char *data);
 void draw_data(int w, int h, int x, int y, char data);
 void write_num_to_oled(unsigned long current_money);
 void init_oled(void);
+void clear_partial(int w, int h, int x, int y);
 
