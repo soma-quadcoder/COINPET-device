@@ -25,6 +25,12 @@ ISR(USART0_RX_vect)
     }
 }
 
+ISR(USART1_RX_vect)
+{
+    char data = UDR1;
+    UDR0 = data;
+}
+
 void init_uart()
 {
     /*
@@ -34,7 +40,16 @@ void init_uart()
     UCSR0B |= (1<<RXCIE0)|(1<<RXEN0)|(1<<TXEN0);
     UCSR0C |= (1<<UCSZ01)|(1<<UCSZ00);
     UBRR0L  = 129; // 20Mhz에서 57600은 21 16Mhz에서 57600은 16
-    //          9600은 129
+                   // 9600은 129
+    
+    /*
+     uart1 사용
+     속도 : 57600
+     */
+    UCSR1B |= (1<<RXCIE1)|(1<<RXEN1)|(1<<TXEN1);
+    UCSR1C |= (1<<UCSZ11)|(1<<UCSZ10);
+    UBRR1L  = 16; // 20Mhz에서 57600은 21 16Mhz에서 57600은 16
+                  // 9600은 129
 }
 
 void make_packet(char opcode, char length, unsigned char data[])

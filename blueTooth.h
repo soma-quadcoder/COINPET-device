@@ -1,4 +1,5 @@
 #include<avr/io.h>
+#include<avr/interrupt.h>
 
 
 //------ 수신 OPCODE를 위한 상수 선언 ------------
@@ -36,4 +37,5 @@ char            isStart;
 
 void init_uart();
 void make_packet(char opcode, char length, unsigned char data[]);
+
 

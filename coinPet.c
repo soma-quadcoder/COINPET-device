@@ -8,22 +8,25 @@
 int main(void)
 {
     init_oled();
+    init_uart();
+    init_adc();
+    get_eeprom_data();  // EEPROM으로 부터 데이터 획득
+    // s_flag => 인증여부, 쌓여있는 데이터 유무
     
     int k = 0;
     for(k=0;k<6;k++)
         draw_char(8,16,30+(k*10),2,font_money[k]);
     
-    write_num_to_oled(0);
     draw_data(128,8,0,0,0x0f);
     draw_data(4, 64,0,0,0xff);
     draw_data(4, 64,124,0,0xff);
     draw_data(120,8,4,8,0xf0);
     
+    write_num_to_oled(current_money);
+    
     sei();
     DDRB = 0xff;
     DDRC&=0x00;
-    init_uart();
-    init_adc();
     PORTB &=0xf7;
 
     
