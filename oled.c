@@ -170,8 +170,8 @@ void write_num_to_oled(unsigned long current_money)
 	unsigned char position 	= 0;
 	unsigned long cu_co	= 0;
 		
-	unsigned char i = 0;
-	unsigned startX = 0;
+	unsigned char i      = 0;
+	unsigned char startX = 0;
 
 	cu_co = current_money;
 	while(1)

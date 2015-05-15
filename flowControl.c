@@ -1,6 +1,6 @@
 #include "flowControl.h"
 
-void change_bit_val(char position, char value)
+void change_bit_val(unsigned char position, unsigned char value)
 {
     //값을 1로 set 하는 경우
     if(value)

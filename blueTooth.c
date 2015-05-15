@@ -4,7 +4,7 @@
 
 ISR(USART0_RX_vect)
 {
-    char data = UDR0;
+    unsigned char data = UDR0;
     
     if(data==START_BYTE && idxArr==0)
         isStart = 1;
@@ -27,7 +27,7 @@ ISR(USART0_RX_vect)
 
 ISR(USART1_RX_vect)
 {
-    char data = UDR1;
+    unsigned char data = UDR1;
     UDR0 = data;
 }
 
@@ -52,7 +52,7 @@ void init_uart()
                   // 9600은 129
 }
 
-void make_packet(char opcode, char length, unsigned char data[])
+void make_packet(unsigned char opcode, char length, unsigned char data[])
 {
     //송신 패킷데이터를 만들어주는 함수
     unsigned char packet[MAX_INDEX];

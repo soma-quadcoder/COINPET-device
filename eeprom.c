@@ -66,7 +66,7 @@ void get_eeprom_data()
     _delay_ms(1);
 }
 
-void eeprom_write(int ad,char val)
+void eeprom_write(int ad,unsigned char val)
 {
     //EEPROM 원하는 주소에 데이터 저장
     eeprom_write_byte(ad,val);

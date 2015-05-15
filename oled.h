@@ -14,6 +14,7 @@ extern unsigned char font_num[11][16];
 #define MISO         PB6
 #define DC           PB3
 #define RST          PB2
+
 #define CHANGE_COLUM 0x21
 #define CHANGE_PAGE  0xB0
 

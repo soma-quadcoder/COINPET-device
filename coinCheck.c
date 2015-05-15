@@ -1,7 +1,7 @@
 #include "coinCheck.h"
 #include "blueTooth.h"
 #include "flowControl.h"
-
+#include "interaction.h"
 
 void init_adc()
 {
@@ -64,4 +64,5 @@ void proccess_coin()
     change_bit_val(INPUT_COIN,0);
     _delay_ms(1);
     write_num_to_oled(current_money);
+    led_interaction(10000,1800,400);
 }

@@ -13,5 +13,5 @@
 
 
 void get_eeprom_data();
-void eeprom_write(int ad,char val);
+void eeprom_write(int ad,unsigned char val);
 unsigned char eeprom_read(int ad);

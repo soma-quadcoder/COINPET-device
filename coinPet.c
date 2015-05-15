@@ -3,13 +3,14 @@
 #include "oled.h"
 #include "coinCheck.h"
 #include "flowControl.h"
-
+#include "interaction.h"
 
 int main(void)
 {
     init_oled();
     init_uart();
     init_adc();
+    init_interaction();
     get_eeprom_data();  // EEPROM으로 부터 데이터 획득
     // s_flag => 인증여부, 쌓여있는 데이터 유무
     

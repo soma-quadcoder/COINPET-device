@@ -22,4 +22,4 @@
 unsigned char   s_flag;
 //------------------------------------------
 
-void change_bit_val(char position, char value);
+void change_bit_val(unsigned char position, unsigned char value);

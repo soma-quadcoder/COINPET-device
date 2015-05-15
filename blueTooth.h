@@ -36,6 +36,6 @@ char            isStart;
 
 
 void init_uart();
-void make_packet(char opcode, char length, unsigned char data[]);
+void make_packet(unsigned char opcode, char length, unsigned char data[]);
 
 
