@@ -1,18 +1,24 @@
 #include "interaction.h"
 
-void init_interaction()
+void init_interaction(void)
 {
     DDRD |= (1<<COIN_LED);
 }
 
-void led_interaction(unsigned char time, unsigned int speed, unsigned int threshold)
+void led_interaction(unsigned int time, unsigned int speed, unsigned int threshold)
 {
+    /*
+     time       : led깜빡이는 횟수 지정
+     speed      : led 최대로 밝아질때까지의 속도 지정
+     threshold  : led 최대 밝기 지정
+     */
+     
     int i = 0;
     int j = 0;
     
     unsigned char flag = 0;
     
-    for(j=0;j<time;j++);
+    while(j!= (time*5))
     {
         for(i=0;i<speed;i++)
         {
@@ -30,6 +36,7 @@ void led_interaction(unsigned char time, unsigned int speed, unsigned int thresh
             threshold--;
         else
             threshold++;
+        j++;
     }
 }
 

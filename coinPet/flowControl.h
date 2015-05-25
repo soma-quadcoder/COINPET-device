@@ -6,6 +6,7 @@
 #define         CONFIRM                 0x80
 #define         CONNECT                 0x40
 #define         ISDATA                  0x20
+#define         ISGAME                  0x10
 #define         GET_INSTRUCTION         0x02
 #define         INPUT_COIN              0x01
 //------------------------------------------

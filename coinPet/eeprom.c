@@ -4,6 +4,9 @@
 
 void get_eeprom_data()
 {
+    unsigned long tmp;
+    unsigned char i;
+    
     /*프로그램 실행시 EEPROM에 저장되어있는
      1. 인증여부데이터	2. 목표금액
      3. 저금금액 		4. 블루투스와 연결안되어있을때 저금한 정보를
@@ -16,11 +19,28 @@ void get_eeprom_data()
      000 0000 ~ 000 0000	 (s_flag)데이터
      */
     
-    // s_flag 데이터를 eeprom으로o i터 가져온다
+    // s_flag 데이터를 eeprom으로 부터 가져온다
     // 인증여부 & 쌓여있는 데이터유무를 알기위해서
-    s_flag = eeprom_read(S_FLAG_ADDRESS);
+    s_flag          = eeprom_read(S_FLAG_ADDRESS);
+    //eeprom_write(S_FLAG_ADDRESS,0x00);
     
+    // 블루투스 미연결때 저장되어있던 동전갯수를 eeprom으로 부터 얻는다
+    saved_coin_cnt  = eeprom_read(UNCONNECT_COIN_CNT_ADD);
+    last_coin_add   = UNCONNECT_COIN_DATA_ADD + (saved_coin_cnt * 7);
     
+    UDR0 = 0x00;
+    // eeprom에 저장되어있는 목표금액을 가져온다
+    for( i=0;i<3;i++ )
+    {
+        tmp = eeprom_read(GOALMONEY_ADDRESS-i)&0xff;
+        UDR0 = tmp;
+        goal_money = goal_money|tmp;
+        _delay_ms(2);
+        if( i < 2 )
+            goal_money = goal_money<<8;
+    }
+    UDR0 = 0x99;
+
     //eeprom에서 획득한 s_flag의 데이터가 0xff라는 의미는
     //default 값이라는 의미이기 때문에 초기화 해준다.
     if(s_flag == DEFAULT_DATA)
@@ -35,7 +55,7 @@ void get_eeprom_data()
     }
     
     // 나중에 변경해야함 -> CONFIRM에서 ISDATA로
-    //if((s_flag&CONFIRM)==CONFIRM)
+    if((s_flag&CONFIRM)==CONFIRM)
     {
         char i=0;
         unsigned tmp;
@@ -44,7 +64,7 @@ void get_eeprom_data()
         {
             tmp = eeprom_read(CURRENT_MONEY-i);
             _delay_ms(1);
-            UDR0 = tmp;
+
             current_money = current_money | tmp;
             if( i==2 )
                 break;
@@ -52,18 +72,7 @@ void get_eeprom_data()
             i++;
             current_money = current_money<<8;
         }
-        
-        // eeprom에 데이터가 저장되어있으면 데이터 호출후 버퍼에 저장
-        if((s_flag&ISDATA)==ISDATA)
-        {
-            for( i=0;i<4;i++ )
-            {
-                data_unconnect[i] = eeprom_read(UNCONNECT_DATA_ADDRESS+i);
-                _delay_ms(1);
-            }
-        }
     }
-    _delay_ms(1);
 }
 
 void eeprom_write(int ad,unsigned char val)

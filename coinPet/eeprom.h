@@ -8,8 +8,13 @@
 #define		INIT_DATA               0x00
 #define		S_FLAG_ADDRESS      	0x00
 #define		CURRENT_MONEY           0x06
-#define		UNCONNECT_DATA_ADDRESS	0x07
+#define     UNCONNECT_COIN_CNT_ADD  0x07
+#define     UNCONNECT_COIN_DATA_ADD 0x08
+#define     GOALMONEY_ADDRESS       0x03
 //-----------------------------------------
+
+unsigned char saved_coin_cnt;
+unsigned char last_coin_add;
 
 
 void get_eeprom_data();

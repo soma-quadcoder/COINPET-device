@@ -4,5 +4,5 @@
 
 #define COIN_LED PD7
 
-void led_interaction(unsigned char time, unsigned int speed, unsigned int threshold);
-void init_interaction();
+void led_interaction(unsigned int time, unsigned int speed, unsigned int threshold);
+void init_interaction(void);

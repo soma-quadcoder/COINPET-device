@@ -9,6 +9,8 @@
 #define         OHBACKWON           500
 //------------------------------------------
 
+#define         COINDETEC_PIN       PB0
+
 //---- 동전구별에 사용될 전역변수 선언 -------------
 unsigned int    adc_max;
 unsigned long   current_money;

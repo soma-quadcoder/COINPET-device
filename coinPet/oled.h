@@ -2,8 +2,12 @@
 #define F_CPU 20000000
 #include<util/delay.h>
 
+extern unsigned char font_register[6][16];
+extern unsigned char font_success[2][16];
+extern unsigned char font_fail[2][16];
 extern unsigned char font_money[6][16];
-extern unsigned char font_num[11][16];
+extern unsigned char font_game[6][16];
+extern unsigned char font_num[12][16];
 
 
 #define SPI_DDR      DDRB
@@ -28,4 +32,5 @@ void draw_data(int w, int h, int x, int y, char data);
 void write_num_to_oled(unsigned long current_money);
 void init_oled(void);
 void clear_partial(int w, int h, int x, int y);
-
+void draw_percentage(unsigned char percent);
+void draw_edge(unsigned char ispercent);
