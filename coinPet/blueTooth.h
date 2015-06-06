@@ -4,13 +4,16 @@
 
 //------ 수신 OPCODE를 위한 상수 선언(블루) --------
 #define         REQUEST_PN              0x01
+#define         ACK                     0x03
 #define         GET_ACK                 0x03
+#define         GET_UTC_TIME            0x04
 #define         LOCK_UNLOCK             0x07
 #define         GET_GOAL                0x05
 #define         REQUEST_SAVED_COIN      0x09
+#define         REQUEST_GAMECONNECT     0x10
 //-------------------------------------------
 
-//------ 송신 OPCODE를 위한 상수 선언(보드) --------
+//------ 송신 OPCODE를 위한 상수 선언(게임보드) --------
 #define         START_GAME              0x11
 #define         SEND_GAMEDATA           'G'
 #define         SUMMIT_DATA             0x12
@@ -21,12 +24,16 @@
 #define         RESPONSE_PN             0x02
 #define         SEND_MONEY              0x08
 #define         SYNC_DATA               0x06
-
+#define         SEND_ISGAME             0x11
+#define         DISCONNECT              0x13
 
 #define         SUCCESS_PN              "s"
 #define         FAIL_PN                 "f"
 #define         SUCCESS_ACK             "s"
 #define         FAIL_ACK                "f"
+#define         CONNECTTING             "y"
+#define         NON_CONNECTTING         "n"
+
 //-------------------------------------------
 
 //----- 송/수신 OPCODE를 위한 상수 선언------------

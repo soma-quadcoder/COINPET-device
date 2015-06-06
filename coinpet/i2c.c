@@ -68,10 +68,9 @@ unsigned char i2c_read(unsigned char dev_add, unsigned char reg_add)
     return get_time_vale(data);
 }
 
-void set_rtc(unsigned char sec,unsigned char min,unsigned char hour,unsigned char date,
+void set_rtc(unsigned char min,unsigned char hour,unsigned char date,
               unsigned char month,unsigned char year)
 {
-    i2c_write( DS1307_ADD ,SEC,     sec );  // 초
     i2c_write( DS1307_ADD ,MINUTE,  min );  // 분
     i2c_write( DS1307_ADD ,HOUR,    hour );  // 시간
     i2c_write( DS1307_ADD ,DATE,    date );  // 일

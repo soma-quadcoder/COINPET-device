@@ -21,29 +21,26 @@ void get_eeprom_data()
     
     // s_flag 데이터를 eeprom으로 부터 가져온다
     // 인증여부 & 쌓여있는 데이터유무를 알기위해서
-    s_flag          = eeprom_read(S_FLAG_ADDRESS);
+    s_flag = eeprom_read(S_FLAG_ADDRESS);
     //eeprom_write(S_FLAG_ADDRESS,0x00);
     
     // 블루투스 미연결때 저장되어있던 동전갯수를 eeprom으로 부터 얻는다
     saved_coin_cnt  = eeprom_read(UNCONNECT_COIN_CNT_ADD);
-    last_coin_add   = UNCONNECT_COIN_DATA_ADD + (saved_coin_cnt * 7);
+    last_coin_add   = UNCONNECT_COIN_DATA_ADD + (saved_coin_cnt * 6);
     
-    UDR0 = 0x00;
     // eeprom에 저장되어있는 목표금액을 가져온다
     for( i=0;i<3;i++ )
     {
         tmp = eeprom_read(GOALMONEY_ADDRESS-i)&0xff;
-        UDR0 = tmp;
         goal_money = goal_money|tmp;
         _delay_ms(2);
         if( i < 2 )
             goal_money = goal_money<<8;
     }
-    UDR0 = 0x99;
 
     //eeprom에서 획득한 s_flag의 데이터가 0xff라는 의미는
     //default 값이라는 의미이기 때문에 초기화 해준다.
-    if(s_flag == DEFAULT_DATA)
+    //if(s_flag == DEFAULT_DATA)
     {
         char i;
         for( i=0;i<10;i++ )

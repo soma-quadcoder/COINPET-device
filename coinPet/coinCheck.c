@@ -24,7 +24,7 @@ void proccess_coin()
      * 400~470      : 100원
      * 490~550      : 500원
      */
-    UDR0 = 0xee;
+
     char i,j;
     char length = 3; //지연이랑 저금금액 보낼때 데이터 패킷의 길이는 3으로 고정하기로함
     
@@ -34,9 +34,9 @@ void proccess_coin()
     unsigned long   tmp_money;
     unsigned long   tmp_current;
     unsigned long   coin_flag;
-    unsigned char percent;
+    unsigned char   percent;
     
-    _delay_ms(1);
+    _delay_us(500);
     // 금액 처리
     if( adc_max>800 && adc_max<1000 )
         coin_flag = SHIPWON;
@@ -56,7 +56,7 @@ void proccess_coin()
     if(coin_flag!=0)
     {
         current_money += coin_flag; // 현재 저축된 총금액 연산
-        tmp_current = current_money;
+        tmp_current    = current_money;
         
         for( i=0;i<length;i++ )
         {
@@ -102,8 +102,6 @@ void proccess_coin()
             _delay_ms(1);
             eeprom_write(last_coin_add++,i2c_read(DS1307_ADD,0x01)); // 분
             _delay_ms(1);
-            eeprom_write(last_coin_add++,i2c_read(DS1307_ADD,0x00)); // 초
-            _delay_ms(1);
             eeprom_write(last_coin_add++,tpm); // 돈
             
             change_bit_val( ISDATA, 1 );
@@ -112,11 +110,10 @@ void proccess_coin()
         }
         
         percent = (current_money*112)/goal_money;
-        
-        UDR0 = percent;
         draw_percentage(percent);
+        
         write_num_to_oled(current_money);
-        led_interaction(350,1200,10);
+        led_interaction(350,1000,10);
     }
     
     // s_flag 0으로 클리어

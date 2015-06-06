@@ -6,6 +6,7 @@
 #include "interaction.h"
 #include "motor.h"
 #include "i2c.h"
+#include "bluetooth.h"
 
 #define GAMEBOARD_DETEC_PIN     PA0
 
@@ -14,6 +15,8 @@ int main(void)
 {
     unsigned char percent;
     int k = 0;
+    
+    _delay_ms(500);
     
     init_oled();
     init_uart();
@@ -32,9 +35,7 @@ int main(void)
     
     draw_edge(0);
     
-    // 제품등록 문구 출력
-    for(k=0;k<6;k++)
-        draw_char(8,16,30+(k*10),2,font_register[k]);
+    make_packet(RESPONSE_PN,1,SUCCESS_PN);
     
     // P/N 인증 과정
     while(1)
@@ -42,6 +43,10 @@ int main(void)
         //P/N 미인증 상태일경우
         if((s_flag&CONFIRM)!=CONFIRM)
         {
+//            // 제품등록 문구 출력
+            for(k=0;k<6;k++)
+                draw_char(8,16,30+(k*10),2,font_register[k]);
+            
             //인증완료될때까지 대기
             while(!(s_flag&CONFIRM))
             {
@@ -66,7 +71,6 @@ int main(void)
     
     
     percent = (current_money*112)/goal_money;
-    UDR0 = percent;
     draw_percentage(percent);
     
     while(1)
@@ -84,24 +88,28 @@ int main(void)
         // 동전인식이 시작되었을경우
         else if(!(PINB & 0x01))
         {
-            _delay_ms(150);
             while(1)
             {
-                _delay_us(200);
+                _delay_us(10);
                 if(ADC < adc_max)
                     adc_max = ADC;
 
                 else
-                    PORTB = 0xff;
+                    _delay_us(1);
                 
+                _delay_us(10);
                 // 동전인식이 종료 & 처리
-                if(PINB & 0x01)
+                if((PINB & 0x01))
                 {
-                    change_bit_val(INPUT_COIN,1);
-                    break;
+                    _delay_us(10);
+                    if(adc_max<1000)
+                    {
+                        change_bit_val(INPUT_COIN,1);
+                        break;
+                    }
                 }
                 else
-                    PORTB = 0xff;
+                    _delay_us(1);
             }
         }
         
@@ -110,8 +118,6 @@ int main(void)
         {
             if(!(PINA&0x01))
             {
-                int k = 0;
-                
                 // 이전에 그려져있던 그림 클리어
                 draw_data(119,44,5,2,0x00);
                 
@@ -120,6 +126,7 @@ int main(void)
                 
                 write_num_to_oled(current_money);
                 change_bit_val(ISGAME,0);
+                make_packet(DISCONNECT,1,"d");
             }
         }
     }

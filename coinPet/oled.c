@@ -65,7 +65,7 @@ void init_SPI_master(void)
 {
     SPI_DDR |= ((1 << SS) | (1 << SCK) | (1 << MOSI) | (1<<DC)|(1<<RST));
     SPI_PORT|= (1 << SS)|(1<<RST);
-    SPCR = ((1 << SPE)|(1 << MSTR)|(1 << SPR0)|(0<<SPR1)); // 16M/16=1Mhz
+    SPCR     = ((1 << SPE)|(1 << MSTR)|(1 << SPR0)|(0<<SPR1)); // 16M/16=1Mhz
 
 }
 
@@ -221,7 +221,11 @@ void write_num_to_oled(unsigned long current_money)
 
 	startX = (110 - ((position+1) * 8))/2 ; // 출력할 숫자를 가운데 정렬하기위한
     
-    clear_partial(8*(position+1),16,startX,5); // 그려진부분에 겹처서 그리는것을 방지하기위해 그리고자하는 부분에 그려져있던것을 클리어
+    if(current_money==0)
+        draw_data(100,16,5,5,0x00);
+        
+    else
+        clear_partial(8*(position+1),16,startX,5); // 그려진부분에 겹처서 그리는것을 방지하기위해 그리고자하는 부분에 그려져있던것을 클리어
 
 	for( position = position-1 ; position > 0 ; position-- )
    		draw_char(8,16,startX+(i++*10),5,font_num[curr_coin[position]]);
@@ -277,7 +281,12 @@ void draw_percentage(unsigned char percent)
 void draw_edge(unsigned char ispercent)
 {
     draw_data(128,8,0,0,0x0f);
-    if(ispercent) draw_data(128,8,0,1,0xf0);
+    if(ispercent)
+    {
+        draw_data(128,8,0,1,0xf0);
+        draw_data(26,8,4,2,0x0f);
+        draw_data(26,8,98,2,0x0f);
+    }
     draw_data(4, 64,0,0,0xff);
     draw_data(4, 64,124,0,0xff);
     draw_data(120,8,4,8,0xf0);
