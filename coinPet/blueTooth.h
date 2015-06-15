@@ -17,6 +17,7 @@
 #define         START_GAME              0x11
 #define         SEND_GAMEDATA           'G'
 #define         SUMMIT_DATA             0x12
+#define         ISCONNECTED             'c'
 //-------------------------------------------
 
 
@@ -33,7 +34,6 @@
 #define         FAIL_ACK                "f"
 #define         CONNECTTING             "y"
 #define         NON_CONNECTTING         "n"
-
 //-------------------------------------------
 
 //----- 송/수신 OPCODE를 위한 상수 선언------------
@@ -58,5 +58,6 @@ void make_packet(unsigned char opcode, char length, unsigned char data[]);
 char compare_pn(unsigned char idx);
 void proccess_instruction(void);
 void get_goal(unsigned char idx);
+unsigned char check_gameboard_connect();
 
 

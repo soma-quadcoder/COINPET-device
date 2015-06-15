@@ -2,6 +2,7 @@
 #define F_CPU 20000000
 #include<util/delay.h>
 
+extern unsigned char font_goal[6][16];
 extern unsigned char font_register[6][16];
 extern unsigned char font_success[2][16];
 extern unsigned char font_fail[2][16];

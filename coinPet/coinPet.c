@@ -35,15 +35,14 @@ int main(void)
     
     draw_edge(0);
     
-    make_packet(RESPONSE_PN,1,SUCCESS_PN);
-    
+
     // P/N 인증 과정
     while(1)
     {
         //P/N 미인증 상태일경우
         if((s_flag&CONFIRM)!=CONFIRM)
         {
-//            // 제품등록 문구 출력
+            // 제품등록 문구 출력
             for(k=0;k<6;k++)
                 draw_char(8,16,30+(k*10),2,font_register[k]);
             
@@ -61,18 +60,19 @@ int main(void)
         else break;
     }
     
-
-    draw_edge(1);
     for(k=0;k<6;k++)
         draw_char(8,16,30+(k*10),2,font_money[k]);
     
     write_num_to_oled(current_money);
     
     
-    
-    percent = (current_money*112)/goal_money;
-    draw_percentage(percent);
-    
+    if(s_flag&ISGOAL)
+    {
+        draw_edge(1);
+        percent = (current_money*112)/goal_money;
+        draw_percentage(percent);
+    }
+
     while(1)
     {
         if(s_flag&INPUT_COIN)
@@ -84,12 +84,13 @@ int main(void)
         // 명령어가 전송되었을경우
         else if(s_flag&GET_INSTRUCTION)
             proccess_instruction();
-        
+
         // 동전인식이 시작되었을경우
         else if(!(PINB & 0x01))
         {
             while(1)
             {
+               
                 _delay_us(10);
                 if(ADC < adc_max)
                     adc_max = ADC;
@@ -97,9 +98,8 @@ int main(void)
                 else
                     _delay_us(1);
                 
-                _delay_us(10);
                 // 동전인식이 종료 & 처리
-                if((PINB & 0x01))
+                if(PINB & 0x01)
                 {
                     _delay_us(10);
                     if(adc_max<1000)
@@ -107,6 +107,8 @@ int main(void)
                         change_bit_val(INPUT_COIN,1);
                         break;
                     }
+                    else
+                        break;
                 }
                 else
                     _delay_us(1);
@@ -116,10 +118,25 @@ int main(void)
         // 게임보드와 연결되었던 상태일경우
         else if(s_flag&ISGAME)
         {
-            if(!(PINA&0x01))
+            unsigned isconnected;
+            
+            // 게임보드 연결확인 패킷 전송
+            UDR1 = ISCONNECTED;
+            while(!(UCSR1A&(1<<UDRE1)));
+            
+            _delay_ms(5);
+
+            if(!check_gameboard_connect())
             {
+
                 // 이전에 그려져있던 그림 클리어
                 draw_data(119,44,5,2,0x00);
+                if(s_flag&ISGOAL)
+                {
+                    draw_edge(1);
+                    percent = (current_money*112)/goal_money;
+                    draw_percentage(percent);
+                }
                 
                 for(k=0;k<6;k++)
                     draw_char(8,16,30+(k*10),2,font_money[k]);

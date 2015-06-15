@@ -1,6 +1,16 @@
 #include <avr/io.h>
 #include "oled.h"
 
+unsigned char font_goal[6][16] =
+{
+    {0xFF,0xFF,0xFF,0x07,0x07,0x07,0x07,0x07,0xFF,0xFF,0xFF,0xE0,0xE0,0xE0,0xE0,0xE0}, /*"["*/
+    {0x3f,0x3f,0x33,0xb3,0xb3,0x33,0x3f,0x3f,0x1b,0x1b,0x1b,0x1b,0x1b,0x1b,0xfb,0xfb}, /*"목"*/
+    {0xc7,0xff,0xff,0xc7,0xc7,0xff,0xff,0xc7,0xe1,0xfd,0xfd,0xe1,0xe1,0xfd,0xfd,0xe1}, /*"표"*/
+    {0xC3,0xC3,0xC3,0xC3,0xC3,0xC3,0xDF,0xDF,0xFC,0xFC,0xCC,0xCC,0xCC,0xCC,0xFC,0xFC}, /*"금"*/
+    {0x7E,0xE7,0xE7,0x7E,0x00,0xFF,0x18,0xFF,0x06,0x06,0x06,0x06,0x06,0x06,0xFE,0xFE}, /*"액"*/
+    {0x07,0x07,0x07,0x07,0x07,0xFF,0xFF,0xFF,0xE0,0xE0,0xE0,0xE0,0xE0,0xFF,0xFF,0xFF} /*"]"*/
+};
+
 unsigned char font_register[6][16] =
 {
     {0xFF,0xFF,0xFF,0x07,0x07,0x07,0x07,0x07,0xFF,0xFF,0xFF,0xE0,0xE0,0xE0,0xE0,0xE0},  /*"["*/
@@ -92,17 +102,7 @@ void write_oled_data(unsigned char data)
 
 void clear_oled(void)
 {
-    unsigned char i, j;
-    
-    for (i = 0; i < 8; i ++)
-    {
-        write_oled(CHANGE_PAGE+i);
-        for (j = 0; j < 128; j ++)
-        {
-            write_oled_data(0x00);
-            _delay_us(100);
-        }
-    }   
+    draw_data(128,64,0,0,0x00);
 }
 
 void draw_char(int w, int h, int x, int y, char *data)
@@ -148,10 +148,10 @@ void clear_partial(int w, int h, int x, int y)
      */
     
     unsigned char i,j;
-    unsigned height		= h/8; 	    //OLED는 한 페이지당 8픽셀을 차지
-    unsigned startY		= CHANGE_PAGE + y; //0xB0은 OLED의 어떤 페이지를 선택하는지에대한 명령어이다
-    unsigned startX     = x+5;	    //+1을하는 이유는 가독성을 높이기 위해서이다(이전글자로부터1픽셀 띄어서 )
-    unsigned endX		= startX + w;
+    unsigned char height		= h/8; 	    //OLED는 한 페이지당 8픽셀을 차지
+    unsigned char startY		= CHANGE_PAGE + y; //0xB0은 OLED의 어떤 페이지를 선택하는지에대한 명령어이다
+    unsigned char startX     = x+5;	    //+1을하는 이유는 가독성을 높이기 위해서이다(이전글자로부터1픽셀 띄어서 )
+    unsigned char endX		= startX + w;
     
     for( i=0;i<height;i++ )
     {
@@ -225,7 +225,8 @@ void write_num_to_oled(unsigned long current_money)
         draw_data(100,16,5,5,0x00);
         
     else
-        clear_partial(8*(position+1),16,startX,5); // 그려진부분에 겹처서 그리는것을 방지하기위해 그리고자하는 부분에 그려져있던것을 클리어
+        draw_data(120,16,4,5,0x00);
+//        draw_data(8*(position+1),16,startX,5,0x00); // 그려진부분에 겹처서 그리는것을 방지하기위해 그리고자하는 부분에 그려져있던것을 클리어
 
 	for( position = position-1 ; position > 0 ; position-- )
    		draw_char(8,16,startX+(i++*10),5,font_num[curr_coin[position]]);

@@ -11,6 +11,9 @@
 
 #define         COINDETEC_PIN       PB0
 
+#define         TURN_ON             1
+#define         TURN_OFF            0
+
 //---- 동전구별에 사용될 전역변수 선언 -------------
 unsigned int    adc_max;
 unsigned long   current_money;
@@ -21,3 +24,4 @@ unsigned char   data_unconnect[4];
 
 void init_adc();
 void proccess_coin();
+void adc_turn_on_off(unsigned isOn);

@@ -40,7 +40,7 @@ void get_eeprom_data()
 
     //eeprom에서 획득한 s_flag의 데이터가 0xff라는 의미는
     //default 값이라는 의미이기 때문에 초기화 해준다.
-    //if(s_flag == DEFAULT_DATA)
+    if(s_flag == DEFAULT_DATA)
     {
         char i;
         for( i=0;i<10;i++ )

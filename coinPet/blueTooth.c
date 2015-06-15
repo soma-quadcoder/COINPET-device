@@ -4,15 +4,18 @@
 #include "eeprom.h"
 #include "oled.h"
 #include "motor.h"
+#include "Interaction.h"
 
 
 unsigned char temp_pn[17]="1234123412341234";
 unsigned long game_money = 0;
+unsigned isConnect;
 
 ISR(USART0_RX_vect)
 {
     unsigned char data = UDR0;
     
+
     if(data==START_BYTE && idxArr==0)
         isStart = 1;
     
@@ -22,6 +25,7 @@ ISR(USART0_RX_vect)
         change_bit_val(GET_INSTRUCTION,1);
         idxArr  = INIT_DATA;
         isStart = INIT_DATA;
+
     }
     
     if(isStart && data!=START_BYTE)
@@ -34,6 +38,7 @@ ISR(USART0_RX_vect)
 
         idxArr++;
     }
+
 }
 
 ISR(USART1_RX_vect)
@@ -56,6 +61,19 @@ ISR(USART1_RX_vect)
         data_buffer[idxArr] = data;
         idxArr++;
     }
+    
+    // 게임보드와 연결상태를 알기위한 변수
+    isConnect = 1;
+}
+
+unsigned char check_gameboard_connect()
+{
+    unsigned temp = isConnect;
+    // 현재 게임보드 연결상태를 위한 변수
+    
+    isConnect = INIT_DATA;
+    
+    return temp;
 }
 
 void init_uart(void)
@@ -103,6 +121,7 @@ void make_packet(unsigned char opcode, char length, unsigned char data[])
         while(!(UCSR0A&(1<<UDRE0)));
         UDR0 = packet[i];
     }
+    while(!(UCSR0A&(1<<UDRE0)));
 }
 
 char compare_pn(unsigned char idx)
@@ -131,6 +150,9 @@ void get_goal( unsigned char idx )
     unsigned long tmp;
     unsigned char len = data_buffer[idx++];
     unsigned char i;
+    unsigned char percent;
+    
+    goal_money = INIT_DATA;
     
     for( i=0;i<len;i++ )
     {
@@ -142,6 +164,25 @@ void get_goal( unsigned char idx )
         if( i < len-1 )
             goal_money = goal_money<<8;
     }
+    
+    // 목표금액 등록문구 출력
+    for(i=0;i<6;i++)
+        draw_char(8,16,30+(i*10),2,font_goal[i]);
+    
+    write_num_to_oled(goal_money);
+    _delay_ms(3000);
+    
+    // 현재금액에 따라 저축금액 퍼센테이지 출력
+    percent = (current_money*112)/goal_money;
+    
+    draw_edge(1);
+    draw_percentage(percent);
+    
+    for(i=0;i<6;i++)
+        draw_char(8,16,30+(i*10),2,font_money[i]);
+    
+    write_num_to_oled(current_money);
+    change_bit_val(ISGOAL,1);	// s_flag ISGOAL bit 1로 set
 }
 
 void proccess_instruction(void)
@@ -159,15 +200,16 @@ void proccess_instruction(void)
     int len ;
     int k;
     
+    _delay_ms(1);
     switch(data_buffer[idx++])
     {
         case REQUEST_PN:
             if(!(s_flag&CONFIRM))
             {
                 // PN 등록요청이오면 PN번호를 비교한다
+                _delay_ms(10);
                 if(compare_pn(idx++))
                 {
-                    make_packet(RESPONSE_PN,1,SUCCESS_PN);
                     change_bit_val(CONFIRM,s_flag-64);	// s_flag CONFIRM bit 1로 set
                     eeprom_write(S_FLAG_ADDRESS, 0x80);	// eeprom에 인증여부 저장
                     
@@ -179,11 +221,11 @@ void proccess_instruction(void)
                     
                     //앞에 그렸던 문구 클리어
                     draw_data(30, 16, 45,5,0x00);
+                    make_packet(RESPONSE_PN,1,SUCCESS_PN);
                 }
                 
                 else
                 {
-                    make_packet(RESPONSE_PN,1,FAIL_PN);
                     //실패 문구 출력
                     for(k=0;k<2;k++)
                         draw_char(8,16,45+(k*10),5,font_fail[k]);
@@ -192,12 +234,15 @@ void proccess_instruction(void)
                     
                     //앞에 그렸던 문구 클리어
                     draw_data(30, 16, 45,5,0x00);
+                    make_packet(RESPONSE_PN,1,FAIL_PN);
                 }
             }
             break;
+            
         case START_GAME:
-            // 이전에 그려져있던 그림 클리어
-            draw_data(119,44,5,2,0x00);
+            //이전화면 모두 클리어
+            clear_oled();
+            draw_edge(0);
             
             for(k=0;k<6;k++)
                 draw_char(8,16,30+(k*10),2,font_game[k]);
@@ -238,7 +283,8 @@ void proccess_instruction(void)
             }
             
             // 게임보드에서 전송 버튼을 클릭했을경우 전송
-            make_packet(SEND_MONEY,3,d);
+            make_packet(SUMMIT_DATA,3,d);
+            led_interaction(BLUE_LED,350,1000,10);
             break;
             
             // 잠금or 해제명령어일경우
@@ -247,8 +293,8 @@ void proccess_instruction(void)
             lock_or_unlock(data_buffer[++idx]);
 
             //성공적으로 데이터 수신했음을 앱에게 알림
+            led_interaction(GREEN_LED,350,1000,10);
             make_packet(ACK,1,SUCCESS_ACK);
-
             break;
             
         case GET_UTC_TIME:
@@ -279,6 +325,7 @@ void proccess_instruction(void)
             lock_or_unlock(data_buffer[++idx]);
             
             //성공적으로 데이터 수신했음을 앱에게 알림
+            led_interaction(GREEN_LED,350,1000,10);
             make_packet(ACK,1,SUCCESS_ACK);
             break;
             
@@ -291,7 +338,6 @@ void proccess_instruction(void)
             break;
             
         default:
-//            UDR0= 0x54;
             break;
     }
     change_bit_val(GET_INSTRUCTION,0); // 명령어 처리후 GET_INSTRUCTION 0 클리어

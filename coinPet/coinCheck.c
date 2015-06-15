@@ -8,8 +8,8 @@
 void init_adc()
 {
     ADMUX   |= (1<<REFS0) | (1<<REFS1) | (1<<MUX0);
-    ADCSRA  |= (1<<ADEN) | (1<<ADPS2)|(2<<ADPS1)|(ADPS0)|
-    (1<<ADSC) | (1<<ADATE) | (0<<ADIE);
+    ADCSRA  |= (1<<ADEN)  | (1<<ADPS2) | (2<<ADPS1)|(ADPS0)|
+               (1<<ADSC)  | (1<<ADATE) | (0<<ADIE);
     
     DDRB &= ~(1<<COINDETEC_PIN);
     
@@ -52,6 +52,8 @@ void proccess_coin()
     tpm = coin_flag/10;
     
     
+    UDR0 = 0xff;
+    
     // 제대로 인식되었을경우 led 인터렉션
     if(coin_flag!=0)
     {
@@ -72,7 +74,6 @@ void proccess_coin()
         
         // 저금한 금액 전송 시도
         make_packet(SEND_MONEY,length,data);
-        
         i=0;
         
         while(1)
@@ -80,7 +81,7 @@ void proccess_coin()
             if(s_flag&CONNECT)
                 break;
             
-            _delay_ms(50);  // 전송성공 ack 대기
+            _delay_ms(100);  // 전송성공 ack 대기
             if(i>4)         // 전송성공 ack를 200ms 동안 대기
                 break;
             i++;
@@ -109,15 +110,41 @@ void proccess_coin()
             _delay_ms(1);
         }
         
-        percent = (current_money*112)/goal_money;
-        draw_percentage(percent);
+        if(!(s_flag&ISGAME))
+        {
+            melody_interaction();
+            if(s_flag&ISGOAL)
+            {
+                percent = (current_money*112)/goal_money;
+                draw_percentage(percent);
+            }
+            
+            write_num_to_oled(current_money);
+            led_interaction(RED_LED,350,1000,10);
+            
+        }
         
-        write_num_to_oled(current_money);
-        led_interaction(350,1000,10);
     }
     
     // s_flag 0으로 클리어
     change_bit_val(INPUT_COIN,0);
     change_bit_val(CONNECT,0);
     _delay_ms(1);
+}
+
+void adc_turn_on_off(unsigned isOn)
+{
+    if(isOn)
+    {
+        ADMUX   |= (1<<REFS0) | (1<<REFS1) | (1<<MUX0);
+        ADCSRA  |= (1<<ADEN)|(1<<ADPS2)|(2<<ADPS1)|(ADPS0)|
+        (1<<ADSC) | (1<<ADATE) | (0<<ADIE);
+        ADCSRA  |= (1<<ADEN);
+    }
+    
+    else
+    {
+        ADMUX   = 0x00;
+        ADCSRA  = 0x00;
+    }
 }
