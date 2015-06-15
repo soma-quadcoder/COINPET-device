@@ -4,8 +4,8 @@
 
 extern unsigned char font_goal[6][16];
 extern unsigned char font_register[6][16];
-extern unsigned char font_success[2][16];
-extern unsigned char font_fail[2][16];
+extern unsigned char font_success[3][16];
+extern unsigned char font_fail[4][16];
 extern unsigned char font_money[6][16];
 extern unsigned char font_game[6][16];
 extern unsigned char font_num[12][16];

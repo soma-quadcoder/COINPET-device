@@ -1,18 +1,52 @@
 #include "interaction.h"
+#include <avr/interrupt.h>
+
+ISR(TIMER1_OVF_vect)
+{
+    static unsigned char cnt = 0;
+    
+    TCNT1 = 0x00;
+    cnt++;
+    
+    // 6초가 지난경우에 멜로디를 끔
+    if( cnt==2 )
+    {
+        PORTA  &= ~(1<<MELODY);
+        
+        // 타이머1 해제
+        TIMSK1 = 0x00;
+        cnt = 0;
+    }
+}
 
 void init_interaction(void)
 {
     // for led interacition
-    DDRD  |= (1<<RED_LED)|(1<<BLUE_LED)|(1<<GREEN_LED);
-    PORTD |= (1<<RED_LED)|(1<<BLUE_LED)|(1<<GREEN_LED);
-
+    DDRD   |= (1<<RED_LED)|(1<<BLUE_LED)|(1<<GREEN_LED);
+    PORTD  |= (1<<RED_LED)|(1<<BLUE_LED)|(1<<GREEN_LED);
+    
     // for melody
-    DDRA |= (1<<MELODY);
+    DDRA  |= (1<<MELODY);
+    
+    // 멜로디를 위한 타이머1 세팅
+    TCCR1B |= (1<<CS12)|(1<<CS10);
+    
 }
 
 void melody_interaction()
 {
-    PORTA |= (1<<MELODY);
+    // 타이머 1 실행
+    cli();
+    
+    PORTA  |= (1<<MELODY);
+    
+    // 멜로디 출력시간을 위한 타이머 1 카운팅
+    TCNT1   = 0x00;
+
+    TIMSK0  = 0x00;
+    TIMSK1 |= (1<<TOIE1);
+    
+    sei();
 }
 
 void led_interaction(unsigned color, unsigned int time, unsigned int speed, unsigned int threshold)

@@ -8,9 +8,10 @@ ISR(TIMER0_COMPA_vect)
 ISR(TIMER0_OVF_vect)
 {
     static char cnt;
+    
     cnt++;
     PORTD &= ~0x10;
-    TCNT0 = 0x00;
+    TCNT0  = 0x00;
     
     // 최소 모터 동작 주기후 모터 전원해제
     if(cnt==70)
@@ -44,12 +45,12 @@ void shutdown_motor_voltage()
 {
     // pwm 발생 인터럽트 해제
     TIMSK0 = (0<<OCIE0A)|(0<<TOIE0);
-    PORTD&=~0x10;
+    PORTD &=~0x10;
 }
 
 void turnon_motor_voltage()
 {
     // pwm 발생 인터럽트 설정
-    TIMSK0 = (1<<OCIE0A)|(1<<TOIE0);
-    PORTD|=0x10;
+    TIMSK0 |= (1<<OCIE0A)|(1<<TOIE0);
+    PORTD  |= 0x10;
 }

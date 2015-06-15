@@ -52,8 +52,6 @@ void proccess_coin()
     tpm = coin_flag/10;
     
     
-    UDR0 = 0xff;
-    
     // 제대로 인식되었을경우 led 인터렉션
     if(coin_flag!=0)
     {

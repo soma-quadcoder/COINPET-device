@@ -214,26 +214,26 @@ void proccess_instruction(void)
                     eeprom_write(S_FLAG_ADDRESS, 0x80);	// eeprom에 인증여부 저장
                     
                     //성공 문구 출력
-                    for(k=0;k<2;k++)
+                    for(k=0;k<3;k++)
                         draw_char(8,16,45+(k*10),5,font_success[k]);
                     
                     _delay_ms(5000);
                     
                     //앞에 그렸던 문구 클리어
-                    draw_data(30, 16, 45,5,0x00);
+                    draw_data(30, 16, 41,5,0x00);
                     make_packet(RESPONSE_PN,1,SUCCESS_PN);
                 }
                 
                 else
                 {
                     //실패 문구 출력
-                    for(k=0;k<2;k++)
+                    for(k=0;k<4;k++)
                         draw_char(8,16,45+(k*10),5,font_fail[k]);
                     
                     _delay_ms(5000);
                     
                     //앞에 그렸던 문구 클리어
-                    draw_data(30, 16, 45,5,0x00);
+                    draw_data(60, 16, 45,5,0x00);
                     make_packet(RESPONSE_PN,1,FAIL_PN);
                 }
             }
